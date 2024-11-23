@@ -1,0 +1,52 @@
+local UIS = game:GetService("UserInputService")
+local Run = game:GetService("RunService")
+local Lplr = game:GetService("Players").LocalPlayer
+local Mouse = Lplr:GetMouse()
+
+local Cam = game.Workspace.Camera
+_G.Squish = 0.45
+
+if _G.Attached ~= nil then return nil end
+Run.RenderStepped:Connect(function()
+    local MAGIC_FORMULA = CFrame.new(0, 0, 0, 1, 0, 0, 0, _G.Squish, 0, 0, 0, 1)
+    Cam.CFrame = Cam.CFrame * MAGIC_FORMULA
+end)
+
+local cd = false
+local click = (mouse1click or mouse1press) ~= nil and function()
+    if cd == true then return nil end
+    task.spawn(function()
+        task.wait()
+        cd = false
+    end)
+    cd = true
+    if mouse1click ~= nil then
+        mouse1click()
+    end
+    if mouse1press ~= nil then
+        mouse1press()
+        task.wait()
+        mouse1release()
+    end
+end or nil
+
+if click ~= nil then
+    Run.Heartbeat:Connect(function()
+        local t = Mouse.Target
+        if t ~= nil then
+            if t.Parent:IsA("Model") or t.Parent.Parent ~= nil and t.Parent.Parent:IsA("Model") then
+                local human = t.Parent:FindFirstChildOfClass("Humanoid") or t.Parent.Parent:FindFirstChildOfClass("Humanoid")
+                if human ~= nil then
+                    local plr = game:GetService("Players"):FindFirstChild(human.Parent.Name)
+                    if plr ~= nil then
+                        if plr.Team ~= Lplr.Team then
+                            click()
+                        end
+                    end
+                end
+            end
+        end
+    end)
+end
+
+_G.Attached = true
